@@ -1,7 +1,11 @@
 from gettext import gettext as _
 import logging
+import os
+from debian import debian_support
+
 from pulp.plugins.util.publish_step import PluginStep
 from pulp_deb.common import constants
+
 
 _logger = logging.getLogger(__name__)
 
@@ -35,7 +39,6 @@ class SyncStep(PluginStep):
         # repo = self.get_repo()
 
         # create a Repository object to interact with
-        # TODO Create a step to get metadata files & read them
         self.add_child(GetMetadataStep())
         # TODO create a pulp.plugins.publish_step.GetLocalUnitsStep to import the units we
         # already know about
@@ -70,4 +73,13 @@ class GetMetadataStep(PluginStep):
         """
         super(GetMetadataStep, self).process_main()
         _logger.debug(self.description)
-        # TODO Download metadata here
+        packages_url = self.get_config().get('feed')
+        packpath = os.path.join(self.get_working_dir() + "/Packages")
+        debian_support.download_file(packages_url + "Packages", packpath)
+        for package in debian_support.PackageFile(packpath):
+            self.parent.available_units.append(get_metadata(dict(package)))
+
+
+def get_metadata(package):
+    unit_key = {"name": package["Package"], "version": package["Version"], "Architecture": package["Architecture"]}
+    return unit_key
