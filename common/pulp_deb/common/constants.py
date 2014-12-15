@@ -34,3 +34,6 @@ PUBLISH_STEP_WEB_PUBLISHER = 'deb_publish_step_web'
 PUBLISH_STEP_CONTENT = 'deb_publish_content'
 PUBLISH_STEP_METADATA = 'deb_publish_metadata'
 PUBLISH_STEP_OVER_HTTP = 'deb_publish_over_http'
+
+SYNC_STEP_DOWNLOAD = 'sync_step_download'
+SYNC_STEP_SAVE = 'sync_step_save'
