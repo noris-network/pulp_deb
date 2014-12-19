@@ -3,7 +3,7 @@ DEB_TYPE_ID = 'deb'
 
 
 # Platform
-CONTENT_DIR = 'content'
+CONTENT_DIR = '/var/lib/pulp/content/%s' % DEB_TYPE_ID
 LINKS_DIR = 'links'
 SHARED_STORAGE = '/var/lib/pulp/content/shared/%s' % DEB_TYPE_ID
 

@@ -60,7 +60,7 @@ class SyncStep(PluginStep):
         :rtype:     collections.Iterable[DownloadRequest]
         """
         for unit_key in self.step_get_local_units.units_to_download:
-            dest_dir = os.path.join(self.working_dir, unit_key["name"] + unit_key["version"] + unit_key["Architecture"])
+            dest_dir = os.path.join(self.working_dir, os.path.basename(unit_key["filename"]))
             packages_url = self.get_config().get('feed')
             packages_url = packages_url.rpartition("/")
             for i in range(1, 5):
@@ -112,8 +112,7 @@ class GetLocalUnitsStepDeb(GetLocalUnitsStep):
         super(GetLocalUnitsStepDeb, self).process_main()
 
     def _dict_to_unit(self, unit_dict):
-        storage_path = os.path.join(self.working_dir, unit_dict["name"] + unit_dict["version"] +
-                                    unit_dict["Architecture"])
+        storage_path = unit_dict["filename"]
         unit_key = {}
         for val in self.unit_key_fields:
             unit_key[val] = unit_dict[val].encode("ascii")
@@ -130,7 +129,7 @@ class SaveUnits(PluginStep):
     def process_main(self):
         _logger.debug(self.description)
         for unit_key in self.parent.step_get_local_units.units_to_download:
-            dest_dir = os.path.join(self.working_dir, unit_key["name"] + unit_key["version"] + unit_key["Architecture"])
+            dest_dir = os.path.join(self.working_dir, os.path.basename(unit_key["filename"]))
             unit = self.get_conduit().init_unit(constants.DEB_TYPE_ID, unit_key, {}, unit_key["filename"])
             shutil.move(dest_dir, unit.storage_path)
             self.get_conduit().save_unit(unit)
