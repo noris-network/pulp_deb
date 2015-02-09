@@ -25,6 +25,7 @@ DISTRIBUTOR_CONFIG_KEY_PUBLISH_DIRECTORY = 'deb_publish_directory'
 DISTRIBUTOR_CONFIG_VALUE_PUBLISH_DIRECTORY = '/var/lib/pulp/published/deb'
 DISTRIBUTOR_CONFIG_FILE_PATH = 'server/plugins.conf.d/deb_distributor.json'
 
+UNIT_KEY_FIELDS = ["name", "version", "architecture", "filename"]
 
 # Steps
 IMPORT_STEP_MAIN = 'import_main'

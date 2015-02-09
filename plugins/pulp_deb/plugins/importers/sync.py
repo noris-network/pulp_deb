@@ -2,13 +2,11 @@ from gettext import gettext as _
 import logging
 import os
 import shutil
+
 from debian import debian_support
-
 from pulp.plugins.model import Unit
-
 from pulp.plugins.util.publish_step import PluginStep, GetLocalUnitsStep, DownloadStep
 from pulp_deb.common import constants
-
 from nectar.request import DownloadRequest
 
 
@@ -37,19 +35,19 @@ class SyncStep(PluginStep):
         # Unit keys, populated by GetMetadataStep
         self.available_units = []
 
-        unit_key_fields = ["name", "version", "Architecture", "filename"]
-
         # config = self.get_config()
         working_dir = self.get_working_dir()
         # repo = self.get_repo()
 
         # create a Repository object to interact with
         self.add_child(GetMetadataStep())
-        self.step_get_local_units = GetLocalUnitsStepDeb(unit_key_fields, self.get_working_dir())
+        self.step_get_local_units = GetLocalUnitsStepDeb(constants.UNIT_KEY_FIELDS, self.get_working_dir())
         self.add_child(self.step_get_local_units)
         self.add_child(
-            DownloadStep(constants.SYNC_STEP_DOWNLOAD, downloads=self.generate_download_requests(), repo=kwargs["repo"],
-                         config=kwargs["config"], working_dir=kwargs["working_dir"], description=_('Downloading remote files')))
+            DownloadStep(constants.SYNC_STEP_DOWNLOAD, downloads=self.generate_download_requests(),
+                         repo=kwargs["repo"],
+                         config=kwargs["config"], working_dir=kwargs["working_dir"],
+                         description=_('Downloading remote files')))
         self.add_child(SaveUnits(working_dir))
 
     def generate_download_requests(self):
@@ -97,7 +95,7 @@ class GetMetadataStep(PluginStep):
         super(GetMetadataStep, self).process_main()
         _logger.debug(self.description)
         packages_url = self.get_config().get('feed')
-        packpath = os.path.join(self.get_working_dir() + "/Packages")
+        packpath = os.path.join(self.get_working_dir() + "Packages")
         debian_support.download_file(packages_url + "Packages", packpath)
         for package in debian_support.PackageFile(packpath):
             self.parent.available_units.append(get_metadata(dict(package)))
@@ -105,8 +103,9 @@ class GetMetadataStep(PluginStep):
 
 class GetLocalUnitsStepDeb(GetLocalUnitsStep):
     def __init__(self, unit_key_fields, working_dir):
-        super(GetLocalUnitsStepDeb, self).__init__(constants.WEB_IMPORTER_TYPE_ID, constants.DEB_TYPE_ID,
-                                                   unit_key_fields, working_dir)
+        super(GetLocalUnitsStepDeb, self).__init__(constants.WEB_IMPORTER_TYPE_ID,
+                                                   constants.DEB_TYPE_ID, unit_key_fields,
+                                                   working_dir)
 
     def process_main(self):
         super(GetLocalUnitsStepDeb, self).process_main()
@@ -116,7 +115,7 @@ class GetLocalUnitsStepDeb(GetLocalUnitsStep):
         unit_key = {}
         for val in self.unit_key_fields:
             unit_key[val] = unit_dict[val].encode("ascii")
-        return Unit(constants.DEB_TYPE_ID, unit_key, {}, storage_path)
+        return Unit(constants.DEB_TYPE_ID, unit_key, unit_dict, storage_path)
 
 
 class SaveUnits(PluginStep):
@@ -130,7 +129,8 @@ class SaveUnits(PluginStep):
         _logger.debug(self.description)
         for unit_key in self.parent.step_get_local_units.units_to_download:
             dest_dir = os.path.join(self.working_dir, os.path.basename(unit_key["filename"]))
-            unit = self.get_conduit().init_unit(constants.DEB_TYPE_ID, unit_key, {}, unit_key["filename"])
+            unit = self.get_conduit().init_unit(constants.DEB_TYPE_ID, unit_key, {},
+                                                unit_key["filename"])
             shutil.move(dest_dir, unit.storage_path)
             self.get_conduit().save_unit(unit)
 
@@ -143,5 +143,6 @@ def get_metadata(package):
     :return:        unit key
     :rtype          dict
     """
-    unit_key = {"name": package["Package"], "version": package["Version"], "Architecture": package["Architecture"], "filename": package["Filename"]}
+    unit_key = {"name": package["Package"], "version": package["Version"],
+                "architecture": package["Architecture"], "filename": package["Filename"]}
     return unit_key
