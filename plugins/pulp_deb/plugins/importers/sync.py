@@ -115,7 +115,7 @@ class GetLocalUnitsStepDeb(GetLocalUnitsStep):
         unit_key = {}
         for val in self.unit_key_fields:
             unit_key[val] = unit_dict[val].encode("ascii")
-        return Unit(constants.DEB_TYPE_ID, unit_key, unit_dict, storage_path)
+        return Unit(constants.DEB_TYPE_ID, unit_key, {}, storage_path)
 
 
 class SaveUnits(PluginStep):
