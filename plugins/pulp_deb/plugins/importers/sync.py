@@ -4,6 +4,7 @@ import os
 import shutil
 
 from debian import debian_support
+
 from pulp.plugins.model import Unit
 from pulp.plugins.util.publish_step import PluginStep, GetLocalUnitsStep, DownloadStep
 from pulp_deb.common import constants
@@ -41,12 +42,13 @@ class SyncStep(PluginStep):
 
         # create a Repository object to interact with
         self.add_child(GetMetadataStep())
-        self.step_get_local_units = GetLocalUnitsStepDeb(constants.UNIT_KEY_FIELDS, self.get_working_dir())
+        self.step_get_local_units = GetLocalUnitsStepDeb(constants.UNIT_KEY_FIELDS,
+                                                         self.get_working_dir())
         self.add_child(self.step_get_local_units)
         self.add_child(
             DownloadStep(constants.SYNC_STEP_DOWNLOAD, downloads=self.generate_download_requests(),
-                         repo=kwargs["repo"],
-                         config=kwargs["config"], working_dir=kwargs["working_dir"],
+                         repo=kwargs["repo"], config=kwargs["config"],
+                         working_dir=kwargs["working_dir"],
                          description=_('Downloading remote files')))
         self.add_child(SaveUnits(working_dir))
 
@@ -113,6 +115,7 @@ class GetLocalUnitsStepDeb(GetLocalUnitsStep):
     def _dict_to_unit(self, unit_dict):
         storage_path = unit_dict["filename"]
         unit_key = {}
+        unit_dict.pop('_id')
         for val in self.unit_key_fields:
             unit_key[val] = unit_dict[val].encode("ascii")
         return Unit(constants.DEB_TYPE_ID, unit_key, unit_dict, storage_path)
