@@ -3,17 +3,16 @@ import hashlib
 import logging
 import os
 import shutil
-import urlparse
 
 from debian import debian_support
+
+import urlparse
 from nectar.request import DownloadRequest
 from pulp.plugins.util import misc
 from pulp.plugins.util.publish_step import PluginStep, GetLocalUnitsStep, DownloadStep
 from pulp.server.exceptions import PulpCodedValidationException
-
 from pulp_deb.common import constants
 from pulp_deb.plugins import error_codes
-
 
 _logger = logging.getLogger(__name__)
 
@@ -47,7 +46,7 @@ class SyncStep(PluginStep):
 
         # create a Repository object to interact with
         self.add_child(GetMetadataStep())
-        self.step_get_local_units = GetLocalUnitsStepDeb()
+        self.step_get_local_units = GetLocalUnitsStepDeb(working_dir)
         self.add_child(self.step_get_local_units)
         self.add_child(
             DownloadStep(constants.SYNC_STEP_DOWNLOAD, downloads=self.generate_download_requests(),
@@ -128,8 +127,10 @@ class GetMetadataStep(PluginStep):
 
 class GetLocalUnitsStepDeb(GetLocalUnitsStep):
 
-    def __init__(self):
-        super(GetLocalUnitsStepDeb, self).__init__(constants.WEB_IMPORTER_TYPE_ID)
+    def __init__(self, working_dir):
+        super(GetLocalUnitsStepDeb, self).__init__(constants.WEB_IMPORTER_TYPE_ID,
+                                                   constants.DEB_TYPE_ID, constants.UNIT_KEY_FIELDS,
+                                                   working_dir)
 
     def _dict_to_unit(self, unit_dict):
         unit_key_hash = get_key_hash(unit_dict)
