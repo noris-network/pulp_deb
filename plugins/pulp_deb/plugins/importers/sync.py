@@ -13,6 +13,7 @@ from pulp.server.exceptions import PulpCodedValidationException
 
 from pulp_deb.common import constants
 from pulp_deb.plugins import error_codes
+from pulp_deb.plugins.db import models
 
 
 _logger = logging.getLogger(__name__)
@@ -116,6 +117,10 @@ class GetMetadataStep(PluginStep):
         debian_support.download_file(packages_url + "Packages", packpath)
         for package in debian_support.PackageFile(packpath):
             package_data = dict(package)
+            package_data['Installed_Size'] = package_data['Installed-Size']
+            package_data.pop('Installed-Size', None)
+            self.parent.available_units.append(models.DEB(**package_data))
+            continue
             metadata = get_metadata(package_data)
             unit_key_hash = get_key_hash(metadata)
             self.parent.deb_data[unit_key_hash] = {

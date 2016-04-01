@@ -29,7 +29,6 @@ LINKS = (
      '/etc/pulp/server/plugins.conf.d/deb_distributor.json'),
     ('plugins/etc/pulp/server/plugins.conf.d/deb_importer.json',
      '/etc/pulp/server/plugins.conf.d/deb_importer.json'),
-    ('plugins/types/deb.json', DIR_PLUGINS + '/types/deb.json'),
 )
 
 

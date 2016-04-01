@@ -15,6 +15,9 @@ setup(
         ],
         'pulp.distributors': [
             'distributor = pulp_deb.plugins.distributors.web:entry_point'
+        ],
+        'pulp.unit_models': [
+            'deb = pulp_deb.plugins.db.models:DEB'
         ]
     }
 )

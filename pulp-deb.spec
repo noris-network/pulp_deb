@@ -109,7 +109,6 @@ to provide Debian package support.
 %defattr(-,root,root,-)
 %{python_sitelib}/pulp_deb/plugins/
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/pulp_deb.conf
-%{_usr}/lib/pulp/plugins/types/deb.json
 %{python_sitelib}/pulp_deb_plugins*.egg-info
 
 %defattr(-,apache,apache,-)
