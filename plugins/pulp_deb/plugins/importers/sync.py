@@ -206,5 +206,5 @@ def get_metadata(package):
     :rtype          dict
     """
     unit_key = {"name": package["Package"], "version": package["Version"],
-                "architecture": package["Architecture"]}
+                "architecture": package["Architecture"], "md5sum": package["MD5sum"]}
     return unit_key
