@@ -174,7 +174,8 @@ class SaveUnits(PluginStep):
 def get_key_hash(metadata):
     unit_key_hash = '::'.join([metadata['name'],
                                metadata['version'],
-                               metadata['architecture']])
+                               metadata['architecture'],
+                               metadata['md5sum']])
     return unit_key_hash
 
 
