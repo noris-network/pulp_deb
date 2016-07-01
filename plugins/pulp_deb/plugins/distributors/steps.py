@@ -71,6 +71,8 @@ class PublishMetadataStep(PluginStep):
                                         cwd=self.get_working_dir(),
                                         stdout=subprocess.PIPE)
                 (out, err) = proc.communicate()
+                if proc.returncode is not 0:
+                    raise subprocess.CalledProcessError(returncode=proc.returncode, cmd='dpkg-scanpackages -m .')
                 dpkg_out.write(out)
                 packfile_gz.write(out)
             finally:
