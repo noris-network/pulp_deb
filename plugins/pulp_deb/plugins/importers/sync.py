@@ -66,7 +66,7 @@ class SyncStep(PluginStep):
         for unit_key in self.step_get_local_units.units_to_download:
             key_hash = get_key_hash(unit_key)
             # Don't save all the units in one directory as there could be 50k + units
-            hash_dir = generate_internal_storage_path(self.deb_data[key_hash]['file_name'])
+            hash_dir = generate_internal_storage_path(key_hash, self.deb_data[key_hash]['file_name'])
             # make sure the download directory exists
             dest_dir = os.path.join(self.working_dir, hash_dir)
             download_dir = os.path.dirname(dest_dir)
@@ -135,7 +135,7 @@ class GetLocalUnitsStepDeb(GetLocalUnitsStep):
     def _dict_to_unit(self, unit_dict):
         unit_key_hash = get_key_hash(unit_dict)
         file_name = self.parent.deb_data[unit_key_hash]['file_name']
-        storage_path = generate_internal_storage_path(file_name)
+        storage_path = generate_internal_storage_path(unit_key_hash, file_name)
         unit_dict.pop('_id')
         return_unit = self.get_conduit().init_unit(
             constants.DEB_TYPE_ID, unit_dict,
@@ -156,7 +156,7 @@ class SaveUnits(PluginStep):
         for unit_key in self.parent.step_get_local_units.units_to_download:
             hash_key = get_key_hash(unit_key)
             file_name = self.parent.deb_data[hash_key]['file_name']
-            storage_path = generate_internal_storage_path(file_name)
+            storage_path = generate_internal_storage_path(hash_key, file_name)
             dest_dir = os.path.join(self.working_dir, storage_path)
             # validate the size of the file downloaded
             file_size = int(self.parent.deb_data[hash_key]['file_size'])
@@ -179,7 +179,7 @@ def get_key_hash(metadata):
     return unit_key_hash
 
 
-def generate_internal_storage_path(file_name):
+def generate_internal_storage_path(key_hash, file_name):
     """
     Generate the internal storage directory for a given deb filename
 
@@ -189,7 +189,7 @@ def generate_internal_storage_path(file_name):
     :returns str: The relative path for storing the unit
     """
     hasher = hashlib.md5()
-    hasher.update(file_name)
+    hasher.update(key_hash)
     hash_digest = hasher.hexdigest()
     part1 = hash_digest[0:1]
     part2 = hash_digest[2:4]
